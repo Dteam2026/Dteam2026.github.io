@@ -1,17 +1,17 @@
-<!DOCTYPE html><html lang="vi"><head>
+<!DOCTYPE html><html lang="ko"><head>
 <!-- META -->
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
-<title>A/B Test - Trang Sản Phẩm</title>
+<title>A/B Test - 상품 페이지</title>
 
-<!-- CSS Layout từ trang mẫu Compose Coffee -->
+<!-- 컴포즈커피 기본 레이아웃 CSS 스타일 -->
 <link rel="stylesheet" href="/layouts/composecoffee2025/css/general.css" />
 <link rel="stylesheet" href="/layouts/composecoffee2025/css/sub.css" />
 <link rel="stylesheet" href="/modules/cafemenu/skins/default/css/list_gallery.css" />
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 
 <style>
-  /* Styling hiển thị tag đánh dấu phiên bản A/B Test */
+  /* A/B 테스트 버전 구분을 위한 상단 안내 배너 */
   .ab-test-banner {
     background-color: #fed900;
     color: #000;
@@ -24,9 +24,9 @@
 </head>
 
 <body>
-  <!-- Tag hiển thị thông tin phiên bản Variant cho bài tập -->
+  <!-- 현재 접속 중인 A/B 테스트 버전을 표시하는 인디케이터 -->
   <div id="ab-variant-indicator" class="ab-test-banner">
-    Đang tải phiên bản A/B Test...
+    A/B 테스트 버전을 불러오는 중입니다...
   </div>
 
   <header>
@@ -47,21 +47,21 @@
         <div class="cafemenu-page" id="listPage">
           <div class="cafemenu-container">
             <div class="cafemenu-menu-header">
-              <h1>DANH MỤC SẢN PHẨM</h1>
-              <p>Thử nghiệm hiệu quả hình ảnh người mẫu (Variant A) vs Ảnh nguyên sản phẩm (Variant B)</p>
+              <h1>상품 목록</h1>
+              <p>모델 착용 이미지(Variant A) vs 제품 단독 이미지(Variant B) 전환율 비교 테스트</p>
             </div>
 
-            <!-- Bộ lọc danh mục -->
+            <!-- 카테고리 필터 영역 -->
             <div class="cafemenu-category-filter">
-              <a href="#" class="cafemenu-category-btn active">Tất cả</a>
-              <a href="#" class="cafemenu-category-btn">Áo Phông</a>
-              <a href="#" class="cafemenu-category-btn">Áo Sơ Mi</a>
-              <a href="#" class="cafemenu-category-btn">Phụ Kiện</a>
+              <a href="#" class="cafemenu-category-btn active">전체</a>
+              <a href="#" class="cafemenu-category-btn">티셔츠</a>
+              <a href="#" class="cafemenu-category-btn">셔츠</a>
+              <a href="#" class="cafemenu-category-btn">액세서리</a>
             </div>
 
-            <!-- Danh sách sản phẩm sẽ được Javascript render tự động theo Variant -->
+            <!-- Variant에 따라 상품 그리드가 동적으로 생성됩니다 -->
             <div class="cafemenu-menu-grid" id="product-grid">
-              <!-- Nội dung sản phẩm sẽ đổ vào đây -->
+              <!-- 상품 항목 삽입 위치 -->
             </div>
 
           </div>
@@ -70,6 +70,85 @@
     </article>
   </div>
 
-<!-- SCRIPT A/B TESTING -->
+<!-- A/B 테스트 로직 스크립트 -->
 <script>
-  // 1. Dữ liệu sản phẩm với 2 loại ảnh tương ứng cho
+  // 1. A/B 테스트용 상품 데이터 (모델 착용 컷 vs 제품 단독 컷)
+  const products = [
+    {
+      id: "sp01",
+      name: "베이직 코튼 프리미엄 티셔츠",
+      imgModel: "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=500", // 모델 착용 이미지
+      imgProductOnly: "https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?w=500" // 제품 단독 이미지
+    },
+    {
+      id: "sp02",
+      name: "오버사이즈 캐주얼 셔츠",
+      imgModel: "https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?w=500",
+      imgProductOnly: "https://images.unsplash.com/photo-1598033129183-c4f50c736f10?w=500"
+    },
+    {
+      id: "sp03",
+      name: "와이드 레그 후드티",
+      imgModel: "https://images.unsplash.com/photo-1556905055-8f358a7a47b2?w=500",
+      imgProductOnly: "https://images.unsplash.com/photo-1578587018452-892bacefd3f2?w=500"
+    },
+    {
+      id: "sp04",
+      name: "스트리트웨어 데님 재킷",
+      imgModel: "https://images.unsplash.com/photo-1543076447-215ad9ba6923?w=500",
+      imgProductOnly: "https://images.unsplash.com/photo-1576995853123-5a10305d93c0?w=500"
+    }
+  ];
+
+  // 2. 사용자를 50:50 비율로 A 또는 B 그룹으로 나누는 함수
+  function getABVariant() {
+    let variant = localStorage.getItem('ab_test_variant');
+    if (!variant) {
+      // 무작위로 'A' 또는 'B' 할당
+      variant = Math.random() < 0.5 ? 'A' : 'B';
+      localStorage.setItem('ab_test_variant', variant);
+    }
+    return variant;
+  }
+
+  // 3. Variant에 맞춰 상품 목록을 렌더링하는 함수
+  function renderProducts() {
+    const variant = getABVariant();
+    const gridContainer = document.getElementById('product-grid');
+    const indicator = document.getElementById('ab-variant-indicator');
+
+    // 상단 안내 문구 업데이트
+    if (variant === 'A') {
+      indicator.innerHTML = "📌 <b>Variant A:</b> <b>모델 착용 이미지</b>가 표시됩니다.";
+    } else {
+      indicator.innerHTML = "📌 <b>Variant B:</b> <b>제품 단독 이미지</b>가 표시됩니다.";
+    }
+
+    // 컴포즈커피 레이아웃 클래스를 활용한 HTML 생성
+    gridContainer.innerHTML = products.map(product => {
+      const imgSrc = (variant === 'A') ? product.imgModel : product.imgProductOnly;
+      
+      return `
+        <a href="#" class="cafemenu-menu-item" data-product-id="${product.id}" onclick="trackClick('${product.id}', '${variant}')">
+          <div class="cafemenu-menu-image">
+             <img src="${imgSrc}" alt="${product.name}" style="width:100%; height: auto; object-fit: cover;">
+          </div>
+          <div class="cafemenu-menu-info">
+             <div class="cafemenu-menu-name">${product.name}</div>
+          </div>
+        </a>
+      `;
+    }).join('');
+  }
+
+  // 4. 클릭 이벤트 트래킹 (클릭률 / CTR 측정용)
+  function trackClick(productId, variant) {
+    console.log(`[A/B Test Analytics] 상품 클릭: ${productId}, 그룹: ${variant}`);
+    alert(`[A/B 테스트] ${variant} 그룹에서 상품을 클릭했습니다! (GA 또는 믹스패널 연동 가능)`);
+  }
+
+  // 페이지 로드 시 실행
+  document.addEventListener("DOMContentLoaded", renderProducts);
+</script>
+</body>
+</html>
