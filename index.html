@@ -1,13 +1,75 @@
-<!DOCTYPE html>
-<html lang="ko">
-<head>
-     <meta charset="UTF-8">
-     <title>나의 VWO 실험 페이지</title>
-  
-     </head>
+<!DOCTYPE html><html lang="vi"><head>
+<!-- META -->
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+<title>A/B Test - Trang Sản Phẩm</title>
+
+<!-- CSS Layout từ trang mẫu Compose Coffee -->
+<link rel="stylesheet" href="/layouts/composecoffee2025/css/general.css" />
+<link rel="stylesheet" href="/layouts/composecoffee2025/css/sub.css" />
+<link rel="stylesheet" href="/modules/cafemenu/skins/default/css/list_gallery.css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+<style>
+  /* Styling hiển thị tag đánh dấu phiên bản A/B Test */
+  .ab-test-banner {
+    background-color: #fed900;
+    color: #000;
+    text-align: center;
+    padding: 10px;
+    font-weight: bold;
+    font-size: 16px;
+  }
+</style>
+</head>
+
 <body>
-     <h1>안녕하세요! VWO 실험 중입니다.</h1>
-     <p>이 버튼의색상을바꾸는A/B 테스트를진행할예정입니다.</p>
-     <button id="test-button">구매하기</button>
-</body>
-</html>
+  <!-- Tag hiển thị thông tin phiên bản Variant cho bài tập -->
+  <div id="ab-variant-indicator" class="ab-test-banner">
+    Đang tải phiên bản A/B Test...
+  </div>
+
+  <header>
+    <div class="hd_bt">
+      <div class="hd_con">
+        <h2 class="lg">
+          <a href="/" title="Store Demo A/B Test">
+            <img src="/layouts/composecoffee2025/img/logo.svg" alt="LOGO" />
+          </a>
+        </h2>
+      </div>
+    </div>
+  </header>
+
+  <div class="wrapper">
+    <article class="article" id="content">
+      <div class="art_con">
+        <div class="cafemenu-page" id="listPage">
+          <div class="cafemenu-container">
+            <div class="cafemenu-menu-header">
+              <h1>DANH MỤC SẢN PHẨM</h1>
+              <p>Thử nghiệm hiệu quả hình ảnh người mẫu (Variant A) vs Ảnh nguyên sản phẩm (Variant B)</p>
+            </div>
+
+            <!-- Bộ lọc danh mục -->
+            <div class="cafemenu-category-filter">
+              <a href="#" class="cafemenu-category-btn active">Tất cả</a>
+              <a href="#" class="cafemenu-category-btn">Áo Phông</a>
+              <a href="#" class="cafemenu-category-btn">Áo Sơ Mi</a>
+              <a href="#" class="cafemenu-category-btn">Phụ Kiện</a>
+            </div>
+
+            <!-- Danh sách sản phẩm sẽ được Javascript render tự động theo Variant -->
+            <div class="cafemenu-menu-grid" id="product-grid">
+              <!-- Nội dung sản phẩm sẽ đổ vào đây -->
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </article>
+  </div>
+
+<!-- SCRIPT A/B TESTING -->
+<script>
+  // 1. Dữ liệu sản phẩm với 2 loại ảnh tương ứng cho
